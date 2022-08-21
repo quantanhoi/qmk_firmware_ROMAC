@@ -16,14 +16,20 @@
 
 #include QMK_KEYBOARD_H
 
+enum {
+    M_COPY = SAFE_RANGE,
+    M_PASTE,
+    M_CUT,
+    M_SELECT_ALL
+};
 char oled_layer[20];
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
-        KC_KP_7, KC_KP_8, KC_KP_9,
+        M_COPY, M_PASTE, KC_KP_9,
         KC_KP_4, KC_KP_5, KC_KP_6,
-        KC_KP_1, KC_KP_2, KC_KP_3,
-        MO(1),   KC_KP_0, KC_KP_DOT
+        KC_KP_1, KC_UP, KC_KP_3,
+        KC_LEFT,   KC_TRNS, KC_RIGHT
     ),
     [1] = LAYOUT(
         KC_TRNS, KC_TRNS, KC_TRNS,
@@ -69,23 +75,37 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-
-
-#ifdef OLED_ENABLE
-oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    return OLED_ROTATION_270;
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if(record->event.pressed) {
+        switch (keycode) {
+            case M_COPY:
+                SEND_STRING(SS_LCTL(SS_TAP(X_C)));
+                return false;
+                break;
+            case M_PASTE:
+                SEND_STRING(SS_LCTL(SS_TAP(X_V)));
+                return false;
+                break;
+        }
+    }
+    return true;
 }
 
-bool oled_task_user(void) {
-  // Host Keyboard Layer Status
-    sprintf(oled_layer,"Layer\nL: %d\n",get_highest_layer(layer_state));
-    oled_write(oled_layer,false);
+// #ifdef OLED_ENABLE
+// oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+//     return OLED_ROTATION_270;
+// }
 
-    // Host Keyboard LED Status
-    led_t led_state = host_keyboard_led_state();
-    oled_write_P(led_state.num_lock ? PSTR("NLCK ") : PSTR("     "), false);
-    oled_write_P(led_state.caps_lock ? PSTR("CAPS ") : PSTR("       "), false);
-    oled_write_P(led_state.scroll_lock ? PSTR("SCRLK") : PSTR("       "), false);
-    return false;
-}
-#endif
+// bool oled_task_user(void) {
+//   // Host Keyboard Layer Status
+//     sprintf(oled_layer,"Layer\nL: %d\n",get_highest_layer(layer_state));
+//     oled_write(oled_layer,false);
+
+//     // Host Keyboard LED Status
+//     led_t led_state = host_keyboard_led_state();
+//     oled_write_P(led_state.num_lock ? PSTR("NLCK ") : PSTR("     "), false);
+//     oled_write_P(led_state.caps_lock ? PSTR("CAPS ") : PSTR("       "), false);
+//     oled_write_P(led_state.scroll_lock ? PSTR("SCRLK") : PSTR("       "), false);
+//     return false;
+// }
+// #endif
