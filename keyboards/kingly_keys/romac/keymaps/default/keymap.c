@@ -25,13 +25,15 @@ enum {
     M_SELECT_ALL,
     M_UNDO,
     M_REDO
+    M_RECORD_OBS
+    M_RECORD_AMD
 };
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 	[_BASE] = LAYOUT(
-		M_CUT, M_SELECT_ALL, KC_KP_9,
-        KC_KP_4, KC_KP_5, KC_KP_6,
-        M_COPY, KC_UP, M_PASTE,
+		M_COPY, M_CUT, KC_PASTE,
+        M_SELECT_ALL, M_RECORD_AMD, M_RECORD_OBS,
+        M_UNDO, KC_UP, M_REDO,
         KC_LEFT,   KC_DOWN, KC_RIGHT
 	),
   
@@ -73,6 +75,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             	SEND_STRING(SS_LCTL(SS_TAP(X_Y)));
             	return false;
             	break;
+            case M_RECORD_OBS:
+            	SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_E)));
+            	return false;
+            	break;
+           	case M_RECORD_AMD:
+	        	SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_R)));
+	        	return false;
+	        	break;
+            	
         }
     }
     return true;
